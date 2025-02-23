@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+body {
+    background: #f6f5f7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding-top: 60px; /* Offset for fixed navbar */
+}
+
+.navbar {
+    width: 100%;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.menu {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.left-menu {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.right-menu {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Logo size adjustment */
+.logo {
+    width: 100px;
+    height: 120px;
+}
+
+/* Form Styling */
+.add-property-form {
+    width: 80%;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.add-property-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+input[type="file"] {
+    padding: 8px;
+    border: 2px dashed #FF7F32;
+    background-color: #fff8f0;
+    cursor: pointer;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #FF7F32;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.submit-btn:hover {
+    background-color: #FF5E00;
+}
+
+.image-note {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+/* Image Preview Styling */
+#imagePreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.preview-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+.primary-image {
+    border: 2px solid #FF7F32; /* Orange border for primary image */
+}
