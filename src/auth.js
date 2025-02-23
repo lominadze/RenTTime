@@ -1,9 +1,9 @@
 import { auth, googleProvider, facebookProvider } from "./firebase-config.js";
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signInWithPopup, 
-    updateProfile 
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    updateProfile
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
 const errorMessages = {
@@ -41,8 +41,12 @@ function registerUser(email, password, username) {
 function loginUser(email, password) {
     return signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            const username = userCredential.user.displayName;
-            localStorage.setItem('username', username);
+            const user = userCredential.user;
+            if (user && user.displayName) {
+                localStorage.setItem('username', user.displayName);
+            } else {
+                localStorage.setItem('username', 'Unknown User');
+            }
             showMessage("loginMessage", "შესვლა წარმატებით დასრულდა!", "success");
             return userCredential;
         })
@@ -58,10 +62,14 @@ function signInWithGoogle() {
     return signInWithPopup(auth, googleProvider)
         .then((result) => {
             const user = result.user;
-            localStorage.setItem('username', user.displayName); // Store Google username
+            if (user && user.displayName) {
+                localStorage.setItem('username', user.displayName); // Store Google username
+            } else {
+                localStorage.setItem('username', 'Unknown User');
+            }
             window.location.href = 'index.html'; // Redirect to homepage
             showMessage("loginMessage", "Google-ით შესვლა წარმატებით დასრულდა!", "success");
-            return user; // Return user for further processing
+            return user;
         })
         .catch((error) => {
             const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
@@ -74,10 +82,14 @@ function signInWithFacebook() {
     return signInWithPopup(auth, facebookProvider)
         .then((result) => {
             const user = result.user;
-            localStorage.setItem('username', user.displayName); // Store Facebook username
+            if (user && user.displayName) {
+                localStorage.setItem('username', user.displayName); // Store Facebook username
+            } else {
+                localStorage.setItem('username', 'Unknown User');
+            }
             window.location.href = 'index.html'; // Redirect to homepage
             showMessage("loginMessage", "Facebook-ით შესვლა წარმატებით დასრულდა!", "success");
-            return user; // Return user for further processing
+            return user;
         })
         .catch((error) => {
             const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
@@ -92,4 +104,4 @@ function showMessage(elementId, message, type) {
     messageElement.className = "message " + type;
 }
 
-export { registerUser , loginUser , signInWithGoogle, signInWithFacebook };
+export { registerUser, loginUser, signInWithGoogle, signInWithFacebook };
