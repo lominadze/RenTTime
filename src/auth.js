@@ -8,39 +8,31 @@ import {
     EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
-const errorMessages = {
-    "auth/weak-password": "შეცდომა: პაროლი უნდა იყოს მინიმუმ 6 სიმბოლო",
-    "auth/email-already-in-use": "შეცდომა: ეს ელ. ფოსტა უკვე დარეგისტრირებულია",
-    "auth/invalid-email": "შეცდომა: არასწორი ელ. ფოსტა",
-    "auth/user-not-found": "შეცდომა: ასეთი მომხმარებელი არ არსებობს",
-    "auth/wrong-password": "შეცდომა: პაროლი არასწორია",
-    "auth/too-many-requests": "შეცდომა: ძალიან ბევრი მცდელობა. სცადეთ შემდეგში",
-    "auth/cancelled-popup-request": "შეცდომა: ფანჯრის დახურვა გაუმართავია",
-    "auth/invalid-credential": "შეცდომა: არასწორი სერთიფიკატი",
-    "auth/account-exists-with-different-credential": "ამ ელ. ფოსტას უკვე აქვს სხვადასხვა ავტორიზაცია. სცადეთ სხვა მეთოდი."
-};
+// "auth/account-exists-with-different-credential" შეცდომის გამართვა
+function handleAccountExistsError(error, email, password) {
+    if (error.code === 'auth/account-exists-with-different-credential') {
+        // Get the provider that was used to create the account (Google or Facebook)
+        const provider = error.credential.providerId;
 
-// რეგისტრაცია
-function registerUser(email, password, username) {
-    return createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Update Firebase user profile with username
-            return updateProfile(userCredential.user, {
-                displayName: username
-            }).then(() => {
-                localStorage.setItem('username', username);
-                showMessage("registerMessage", "რეგისტრაცია წარმატებით შესრულდა!", "success");
-                return userCredential;
+        // Create a new credential using the email and password
+        const credential = EmailAuthProvider.credential(email, password);
+
+        // Link the account with the new credential
+        return auth.currentUser.linkWithCredential(credential)
+            .then(() => {
+                // Successfully linked the accounts
+                showMessage("loginMessage", "ანგარიში წარმატებით დაკავშირებულია!", "success");
+                window.location.href = 'index.html'; // Redirect to homepage after successful linking
+            })
+            .catch((linkError) => {
+                const errorMessage = errorMessages[linkError.code] || "შეცდომა: " + linkError.message;
+                showMessage("loginMessage", errorMessage, "error");
             });
-        })
-        .catch((error) => {
-            const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
-            showMessage("registerMessage", errorMessage, "error");
-            throw error;
-        });
+    }
+    return Promise.reject(error); // If not account-exists error, reject the promise
 }
 
-// შესვლა
+// Login function (email/password login)
 function loginUser(email, password) {
     return signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -50,13 +42,16 @@ function loginUser(email, password) {
             return userCredential;
         })
         .catch((error) => {
+            // Handle the specific error
             const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
             showMessage("loginMessage", errorMessage, "error");
-            throw error;
+
+            // If the error is 'auth/account-exists-with-different-credential', try to link the accounts
+            return handleAccountExistsError(error, email, password);
         });
 }
 
-// Google შესვლა
+// Google login
 function signInWithGoogle() {
     return signInWithPopup(auth, googleProvider)
         .then((result) => {
@@ -64,7 +59,7 @@ function signInWithGoogle() {
             localStorage.setItem('username', user.displayName);
             window.location.href = 'index.html'; // Redirect to homepage
             showMessage("loginMessage", "Google-ით შესვლა წარმატებით დასრულდა!", "success");
-            return user; // Return user for further processing
+            return user;
         })
         .catch((error) => {
             const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
@@ -72,7 +67,7 @@ function signInWithGoogle() {
         });
 }
 
-// Facebook შესვლა
+// Facebook login
 function signInWithFacebook() {
     return signInWithPopup(auth, facebookProvider)
         .then((result) => {
@@ -80,20 +75,7 @@ function signInWithFacebook() {
             localStorage.setItem('username', user.displayName);
             window.location.href = 'index.html'; // Redirect to homepage
             showMessage("loginMessage", "Facebook-ით შესვლა წარმატებით დასრულდა!", "success");
-            return user; // Return user for further processing
-        })
-        .catch((error) => {
-            const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
-            showMessage("loginMessage", errorMessage, "error");
-        });
-}
-
-// Account linking - if email exists with different credentials
-function linkAccountWithEmail(email, password) {
-    const credential = EmailAuthProvider.credential(email, password);
-    return linkWithCredential(auth.currentUser, credential)
-        .then(() => {
-            showMessage("loginMessage", "ანგარიში წარმატებით დაკავშირებულია!", "success");
+            return user;
         })
         .catch((error) => {
             const errorMessage = errorMessages[error.code] || "შეცდომა: " + error.message;
@@ -108,4 +90,4 @@ function showMessage(elementId, message, type) {
     messageElement.className = "message " + type;
 }
 
-export { registerUser , loginUser , signInWithGoogle, signInWithFacebook, linkAccountWithEmail };
+export { loginUser, signInWithGoogle, signInWithFacebook };
