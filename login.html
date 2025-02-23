@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RenTime - რეგისტრაცია / შესვლა</title>
+    <link rel="stylesheet" href="style/login.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container" id="container">
+        <!-- რეგისტრაცია -->
+        <div class="form-container sign-up-container">
+            <form id="registerForm">
+                <h1>რეგისტრაცია</h1>
+                <div class="social-container">
+                    <a href="#" id="googleSignup" class="social"><i class="fab fa-google"></i></a>
+                    <a href="#" id="facebookSignup" class="social"><i class="fab fa-facebook-f"></i></a>
+                </div>
+                <span>ან გამოიყენეთ თქვენი ელ-ფოსტა რეგისტრაციისთვის</span>
+                <input type="text" id="registerUsername" placeholder="მომხმარებლის სახელი" required />
+                <input type="email" id="registerEmail" placeholder="ელ-ფოსტა" required />
+                <input type="tel" id="registerPhone" placeholder="ტელეფონის ნომერი" required />
+                <input type="password" id="registerPassword" placeholder="პაროლი" required />
+                <button type="submit">რეგისტრაცია</button>
+                <p id="registerMessage"></p>
+            </form>
+        </div>
+
+        <!-- შესვლა -->
+        <div class="form-container sign-in-container">
+            <form id="loginForm">
+                <h1>შესვლა</h1>
+                <div class="social-container">
+                    <a href="#" id="googleLogin" class="social"><i class="fab fa-google"></i></a>
+                    <a href="#" id="facebookLogin" class="social"><i class="fab fa-facebook-f"></i></a>
+                </div>
+                <span>ან გამოიყენეთ თქვენი ანგარიში</span>
+                <input type="email" id="loginEmail" placeholder="ელ-ფოსტა" required />
+                <input type="password" id="loginPassword" placeholder="პაროლი" required />
+                <a href="#">დაგავიწყდა პაროლი?</a>
+                <button type="submit">შესვლა</button>
+                <p id="loginMessage"></p>
+            </form>
+        </div>
+
+        <!-- გადამფურცველის (Overlay) პანელები -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>მოგესალმებით!</h1>
+                    <p>იმისთვის, რომ დაკავშირება განაგრძოთ, გთხოვთ, გაიაროთ შესვლა თქვენი პირადი მონაცემებით</p>
+                    <button class="ghost" id="signIn">შესვლა</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>გამარჯობა, მეგობარო!</h1>
+                    <p>შეიყვანეთ თქვენი პირადი მონაცემები და დაიწყეთ მოგზაურობა ჩვენთან</p>
+                    <button class="ghost" id="signUp">რეგისტრაცია</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { registerUser, loginUser, signInWithGoogle, signInWithFacebook } from './src/auth.js';
+
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+
+        // Registration functionality
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            registerUser(email, password, username)
+                .then(() => {
+                    window.location.href = 'index.html'; // Redirect after registration
+                })
+                .catch(() => { /* Errors already handled */ });
+        });
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            loginUser(email, password)
+                .then(() => {
+                    window.location.href = 'index.html'; // Redirect after login
+                })
+                .catch(() => { /* Errors already handled */ });
+        });
+
+        // Google and Facebook login
+        document.getElementById('googleLogin').addEventListener('click', function() {
+            signInWithGoogle().then((user) => {
+                localStorage.setItem('username', user.displayName); // Store Google username
+                window.location.href = 'index.html';
+            });
+        });
+
+        document.getElementById('facebookLogin').addEventListener('click', function() {
+            signInWithFacebook().then((user) => {
+                localStorage.setItem('username', user.displayName); // Store Facebook username
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+
+    <script type="module" src="src/auth.js"></script>
+    <script type="module" src="src/firebase-config.js"></script>
+</body>
+</html>
