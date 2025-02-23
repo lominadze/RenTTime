@@ -21,7 +21,6 @@ const errorMessages = {
 function registerUser(email, password, username) {
     return createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            // Update Firebase user profile with username
             return updateProfile(userCredential.user, {
                 displayName: username
             }).then(() => {
